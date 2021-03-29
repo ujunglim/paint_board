@@ -5,6 +5,7 @@ const colors = document.getElementsByClassName("jsColor");
 const range = document.getElementById("jsRange");
 const modeBtn = document.getElementById("jsMode");
 const saveBtn = document.getElementById("jsSave");
+const resetBtn = document.getElementById("jsReset");
 
 const INITIAL_COLOR = "#2c2c2c";
 const CANVAS_SIZE = 500;
@@ -86,7 +87,7 @@ function handleCM(event) {
   event.preventDefault();
 }
 
-function handleSaveClick(event) {
+function handleSaveClick() {
   // get canvas data as image url
   const image = canvas.toDataURL();
   // create link that doesnt exist
@@ -94,6 +95,10 @@ function handleSaveClick(event) {
   link.href = image;
   link.download = "PaintBoard[🎨]";
   link.click();
+}
+
+function handleResetClick() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 if(canvas) {
@@ -120,4 +125,8 @@ if(modeBtn) {
 
 if(saveBtn) {
   saveBtn.addEventListener("click", handleSaveClick);
+}
+
+if(resetBtn) {
+  resetBtn.addEventListener("click", handleResetClick);
 }
