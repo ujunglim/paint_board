@@ -6,9 +6,12 @@ const range = document.getElementById("jsRange");
 const modeBtn = document.getElementById("jsMode");
 const saveBtn = document.getElementById("jsSave");
 const resetBtn = document.getElementById("jsReset");
+const eraseBtn = document.getElementById("jsErase");
 
 const INITIAL_COLOR = "#2c2c2c";
 const CANVAS_SIZE = 500;
+const PAINT = 0;
+const ERASE = 1;
 
 
 // canvas elemetn has 2 sizes: css size and
@@ -25,32 +28,40 @@ ctx.lineWidth = 2.5;
 
 let painting = false;
 let filling = false;
+let erasing = false;
+let mode = PAINT;
 
-function startPainting() {
-  if(!filling) {
+function onMouseDown(event) {
+  if(mode === PAINT) {
     painting = true;
+    const x = event.offsetX;
+    const y = event.offsetY;
+    // create path
+    ctx.beginPath();
+    ctx.moveTo(x, y);
   }
-}
-
-function stopPainting() {
-  painting = false;
+  else if(mode === ERASE) {
+    erasing = true;
+  }
 }
 
 // detect movements
 function onMouseMove(event) {
   const x = event.offsetX;
   const y = event.offsetY;
-
-  if(!painting) {
-    // create path
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-  }
-  else {
+  if(mode === PAINT && painting) {
     // create line
     ctx.lineTo(x, y);
-    ctx.stroke();
+    ctx.stroke();  
   }
+  else if (mode === ERASE && erasing) {
+    ctx.clearRect(x, y, 10, 10);
+  }
+}
+// when mouse up or leave
+function stop() {
+  painting = false;
+  erasing = false;
 }
 
 function handleColorClick(event) {
@@ -65,6 +76,8 @@ function handleRangeChange(event) {
 }
 
 function handleModeClick() {
+  mode = PAINT;
+  
   if(filling === true) {
     filling = false;
     modeBtn.innerText = "Fill";
@@ -77,7 +90,7 @@ function handleModeClick() {
 
 // filling canvas
 function handleCanvasClick() {
-  if(filling) {
+  if((mode === PAINT) && filling) {
     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
   }
 }
@@ -101,11 +114,15 @@ function handleResetClick() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+function handleEraseClick() {
+  mode = ERASE;
+}
+
 if(canvas) {
+  canvas.addEventListener("mousedown", onMouseDown);
   canvas.addEventListener("mousemove", onMouseMove);
-  canvas.addEventListener("mousedown", startPainting);
-  canvas.addEventListener("mouseup", stopPainting);
-  canvas.addEventListener("mouseleave", stopPainting);  // when mouse out of canvas
+  canvas.addEventListener("mouseup", stop);
+  canvas.addEventListener("mouseleave", stop);
   canvas.addEventListener("click", handleCanvasClick);
   canvas.addEventListener("contextmenu", handleCM); 
 }
@@ -129,4 +146,8 @@ if(saveBtn) {
 
 if(resetBtn) {
   resetBtn.addEventListener("click", handleResetClick);
+}
+
+if(eraseBtn) {
+  eraseBtn.addEventListener("click", handleEraseClick);
 }
