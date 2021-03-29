@@ -18,6 +18,7 @@ const ERASE = 1;
 // pixel modifier size
 canvas.width = CANVAS_SIZE;
 canvas.height = CANVAS_SIZE;
+canvas.style.cursor = `url("./image/pencil.png") 0 30, auto`;  // cursor origin 
 
 // initialize
 ctx.fillStyle = "white";
@@ -55,7 +56,8 @@ function onMouseMove(event) {
     ctx.stroke();  
   }
   else if (mode === ERASE && erasing) {
-    ctx.clearRect(x, y, 10, 10);
+    const eraseWidth = ctx.lineWidth + 2.5;
+    ctx.clearRect(x, y, eraseWidth, eraseWidth);
   }
 }
 // when mouse up or leave
@@ -73,9 +75,11 @@ function handleColorClick(event) {
 function handleRangeChange(event) {
   const size = event.target.value;
   ctx.lineWidth = size;
+  console.log(size);
 }
 
 function handleModeClick() {
+  canvas.style.cursor = `url("./image/pencil.png") 0 30, auto`;
   mode = PAINT;
   
   if(filling === true) {
@@ -116,6 +120,7 @@ function handleResetClick() {
 
 function handleEraseClick() {
   mode = ERASE;
+  canvas.style.cursor = `url("./image/eraser.png") 0 30, auto`;
 }
 
 if(canvas) {
