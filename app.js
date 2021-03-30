@@ -31,8 +31,10 @@ let painting = false;
 let filling = false;
 let erasing = false;
 let mode = PAINT;
+let selectedColorIndex = 0; // black
 
-function onMouseDown(event) {
+
+const onMouseDown = (event) => {
   if(mode === PAINT) {
     painting = true;
     const x = event.offsetX;
@@ -47,7 +49,7 @@ function onMouseDown(event) {
 }
 
 // detect movements
-function onMouseMove(event) {
+const onMouseMove = (event) => {
   const x = event.offsetX;
   const y = event.offsetY;
   if(mode === PAINT && painting) {
@@ -60,25 +62,21 @@ function onMouseMove(event) {
     ctx.clearRect(x, y, eraseWidth, eraseWidth);
   }
 }
+
 // when mouse up or leave
-function stop() {
+const stop = () => {
   painting = false;
   erasing = false;
 }
 
-function handleColorClick(event) {
-  const color = event.target.style.backgroundColor;
-  ctx.strokeStyle = color; 
-  ctx.fillStyle = ctx.strokeStyle;
-}
-
-function handleRangeChange(event) {
+const onRangeChange = (event) => {
   const size = event.target.value;
   ctx.lineWidth = size;
-  console.log(size);
 }
 
-function handleModeClick() {
+const onModeClick = () => {
+  eraseBtn.classList.remove('selected');
+  modeBtn.classList.add('selected');
   canvas.style.cursor = `url("./image/pencil.png") 0 30, auto`;
   mode = PAINT;
   
@@ -93,18 +91,18 @@ function handleModeClick() {
 }
 
 // filling canvas
-function handleCanvasClick() {
+const onCanvasClick = () => {
   if((mode === PAINT) && filling) {
     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
   }
 }
 
 // prevent mouse right click
-function handleCM(event) {
+const onContextMenu = (event) => {
   event.preventDefault();
 }
 
-function handleSaveClick() {
+const onSaveClick = () => {
   // get canvas data as image url
   const image = canvas.toDataURL();
   // create link that doesnt exist
@@ -114,13 +112,31 @@ function handleSaveClick() {
   link.click();
 }
 
-function handleResetClick() {
+const onResetClick = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function handleEraseClick() {
+const onEraseClick = () => {
+  modeBtn.classList.remove('selected');
+  eraseBtn.classList.add('selected');
+
   mode = ERASE;
   canvas.style.cursor = `url("./image/eraser.png") 0 30, auto`;
+}
+
+const selectColor = (color, index) => {
+  color.addEventListener("click", (event) => {
+    // get selected color
+    const selectedColor = event.target.style.backgroundColor;
+    ctx.strokeStyle = selectedColor; 
+    ctx.fillStyle = ctx.strokeStyle;
+
+    // check tag
+    colors[selectedColorIndex].classList.remove('selected');   // prev selected color
+    selectedColorIndex = index;  // curr selected color
+    color.classList.add('selected');
+
+  })
 }
 
 if(canvas) {
@@ -128,31 +144,30 @@ if(canvas) {
   canvas.addEventListener("mousemove", onMouseMove);
   canvas.addEventListener("mouseup", stop);
   canvas.addEventListener("mouseleave", stop);
-  canvas.addEventListener("click", handleCanvasClick);
-  canvas.addEventListener("contextmenu", handleCM); 
+  canvas.addEventListener("click", onCanvasClick);
+  canvas.addEventListener("contextmenu", onContextMenu); 
 }
 
-//=======---===== Control Colors =====================
+//================ Control =====================
 // convert obj to array
-Array.from(colors).forEach(color => color.addEventListener("click", handleColorClick));
+Array.from(colors).forEach((color, index) => selectColor(color, index));
 
-//=======---===== Control Range =====================
 if(range) {
-  range.addEventListener("input", handleRangeChange);
+  range.addEventListener("input", onRangeChange);
 }
 
 if(modeBtn) {
-  modeBtn.addEventListener("click", handleModeClick);
+  modeBtn.addEventListener("click", onModeClick);
 }
 
 if(saveBtn) {
-  saveBtn.addEventListener("click", handleSaveClick);
+  saveBtn.addEventListener("click", onSaveClick);
 }
 
 if(resetBtn) {
-  resetBtn.addEventListener("click", handleResetClick);
+  resetBtn.addEventListener("click", onResetClick);
 }
 
 if(eraseBtn) {
-  eraseBtn.addEventListener("click", handleEraseClick);
+  eraseBtn.addEventListener("click", onEraseClick);
 }

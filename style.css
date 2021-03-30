@@ -59,6 +59,12 @@ body {
   transform: scale(0.98);
 }
 
+.controls_btns button.selected {
+  background-color: #0075ff;
+  color: white;
+  border: 2px solid #0075ff;
+}
+
 .controls_colors {
   display: flex;
 }
@@ -69,4 +75,19 @@ body {
   border-radius: 25px;
   cursor: pointer;
   box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.controls_color:hover {
+  transform: scale(1.2);
+}
+
+.controls_color.selected:before {
+  content: url("./image/check_white.png");
+  position: relative;
+  top: 20%;
+  left: 20%;
+}
+
+.controls_color:nth-child(2).selected:before {
+  content: url("./image/check_grey.png");
 }
